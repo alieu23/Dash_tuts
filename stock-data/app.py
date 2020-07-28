@@ -9,6 +9,7 @@ from dash.dependencies import Input, Output
 # Load data
 df = pd.read_csv('data/stockdata2.csv', index_col=0, parse_dates=True)
 df.index = pd.to_datetime(df['Date'])
+
 external_stylesheet = ['assets/style.css']
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=external_stylesheet)
@@ -37,7 +38,7 @@ app.layout = html.Div(
                                                dcc.Dropdown(id='stockselector',
                                                             options=get_options(df['stock'].unique()),
                                                             multi=True,
-                                                            value=[df['stock'].sort_values()[0]],
+                                                            value=[df['stock'].sort_index()[0]],
                                                             style={'backgroundColor': '#1E1E1E'},
                                                             className='stockselector'
                                                             )
@@ -50,7 +51,8 @@ app.layout = html.Div(
                               children=[
                                   dcc.Graph(id='timeseries',
                                             config={'displayModeBar': False},
-                                            animate=True, )
+                                            animate=True, ),
+                                  # dcc.Graph(id='changes', config={'displayModeBar': False} )
 
                                   # figure=px.line(df,
                                   #              x='Date',
@@ -81,7 +83,8 @@ def update_graph(selected_dropdown_value):
                                  mode='lines',
                                  opacity=0.7,
                                  name=stock,
-                                 textposition='bottom center'))
+                                 textposition='bottom center'
+                                 ))
     traces = [trace1]
     data = [val for sublist in traces for val in sublist]
     figure = {'data': data,
